@@ -104,8 +104,9 @@ class Trainer:
             "accuracy": accuracy
 
         }
-@torch.no_grad()
-def validate(
+
+    @torch.no_grad()
+    def validate(
         self,
         dataloader
     ):
