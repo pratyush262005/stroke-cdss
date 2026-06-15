@@ -1,2 +1,1 @@
-
-print("symmetry loaded")
+ 
