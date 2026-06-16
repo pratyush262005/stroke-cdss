@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, random_split
 
-sys.path.append("/content/stroke-cdss/src")
+sys.path.append(r"D:\vscode\SWIM\stroke-cdss\src")
 
 from imaging.dataset import StrokeDataset
 from models.stroke_model import StrokeModel
@@ -17,10 +17,8 @@ from training.trainer import Trainer
 # CONFIG
 # ==========================================================
 
-DATASET_ROOT = (
-    "/kaggle/input/brain-stroke-ct-dataset/"
-    "Brain_Stroke_CT_Dataset"
-)
+DATASET_ROOT =r"D:\vscode\SWIM\Brain_Stroke_CT_Dataset"
+
 
 BATCH_SIZE = 8
 NUM_EPOCHS = 20
@@ -32,8 +30,8 @@ DEVICE = (
     else "cpu"
 )
 
-CHECKPOINT_DIR = (
-    Path("/content/stroke-cdss/checkpoints")
+CHECKPOINT_DIR = Path(
+    r"D:\vscode\SWIM\stroke-cdss\checkpoints"
 )
 
 CHECKPOINT_DIR.mkdir(
@@ -84,14 +82,14 @@ train_loader = DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
     shuffle=True,
-    num_workers=2
+    num_workers=0
 )
 
 val_loader = DataLoader(
     val_dataset,
     batch_size=BATCH_SIZE,
     shuffle=False,
-    num_workers=2
+    num_workers=0
 )
 
 
