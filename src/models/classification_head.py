@@ -1,52 +1,120 @@
 """
 classification_head.py
 
-Step 3
+Classification Head for Stroke CDSS
 
-Multi-Class Stroke Classification
+Classes:
+0 -> Normal
+1 -> Bleeding
+2 -> Ischemia
+
+Author: Stroke CDSS Project
 """
 
 import torch
 import torch.nn as nn
 
 
-class StrokeClassificationHead(nn.Module):
+# ============================================================
+# Classification Head
+# ============================================================
+
+class ClassificationHead(nn.Module):
 
     def __init__(
         self,
-        input_dim=768,
-        hidden_dim=512,
+        in_features=768,
         num_classes=3,
         dropout=0.3
     ):
+
         super().__init__()
+
+        self.pool = nn.AdaptiveAvgPool2d(
+            (1, 1)
+        )
 
         self.classifier = nn.Sequential(
 
+            nn.Flatten(),
+
             nn.Linear(
-                input_dim,
-                hidden_dim
+                in_features,
+                512
             ),
 
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
 
             nn.Dropout(
                 dropout
             ),
 
             nn.Linear(
-                hidden_dim,
+                512,
+                128
+            ),
+
+            nn.ReLU(inplace=True),
+
+            nn.Dropout(
+                dropout
+            ),
+
+            nn.Linear(
+                128,
                 num_classes
             )
         )
 
+    # ========================================================
+    # Forward
+    # ========================================================
+
     def forward(
         self,
-        image_feature_vector
+        x
     ):
 
+        # x shape:
+        # [B, 768, 7, 7]
+
+        x = self.pool(
+            x
+        )
+
         logits = self.classifier(
-            image_feature_vector
+            x
         )
 
         return logits
+
+
+# ============================================================
+# Unit Test
+# ============================================================
+
+if __name__ == "__main__":
+
+    DEVICE = torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "cpu"
+    )
+
+    model = ClassificationHead().to(
+        DEVICE
+    )
+
+    x = torch.randn(
+        2,
+        768,
+        7,
+        7
+    ).to(DEVICE)
+
+    logits = model(x)
+
+    print(
+        "Logits Shape:",
+        logits.shape
+    )

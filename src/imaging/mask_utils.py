@@ -50,9 +50,16 @@ class LesionMaskProcessor:
 
         mask_path = Path(mask_path)
 
+        # ----------------------------------------------------
+        # Normal scans do not have lesion masks.
+        # Return empty mask.
+        # ----------------------------------------------------
+
         if not mask_path.exists():
-            raise FileNotFoundError(
-                f"Mask not found: {mask_path}"
+
+            return np.zeros(
+                (224, 224),
+                dtype=np.uint8
             )
 
         mask = cv2.imread(
@@ -61,6 +68,7 @@ class LesionMaskProcessor:
         )
 
         if mask is None:
+
             raise MaskProcessingError(
                 f"Failed reading mask: {mask_path}"
             )
@@ -185,11 +193,17 @@ class LesionMaskProcessor:
         output_size=(224, 224)
     ) -> Dict[str, Any]:
 
-        mask = self.load_mask(mask_path)
+        mask = self.load_mask(
+            mask_path
+        )
 
-        mask = self.binarize(mask)
+        mask = self.binarize(
+            mask
+        )
 
-        stats = self.compute_statistics(mask)
+        stats = self.compute_statistics(
+            mask
+        )
 
         mask = self.resize(
             mask,
@@ -197,8 +211,12 @@ class LesionMaskProcessor:
         )
 
         return {
-            "mask": mask.astype(np.uint8),
-            "statistics": stats
+
+            "mask":
+                mask.astype(np.float32),
+
+            "statistics":
+                stats
         }
 
 
@@ -206,9 +224,14 @@ class LesionMaskProcessor:
 # Visualization
 # ============================================================
 
-def visualize_mask(mask, title="Mask"):
+def visualize_mask(
+    mask,
+    title="Mask"
+):
 
-    plt.figure(figsize=(6, 6))
+    plt.figure(
+        figsize=(6, 6)
+    )
 
     plt.imshow(
         mask,
@@ -235,6 +258,7 @@ def overlay_mask_on_image(
     image = image.copy()
 
     if image.max() <= 1:
+
         image = (
             image * 255
         ).astype(np.uint8)
@@ -244,7 +268,9 @@ def overlay_mask_on_image(
         cv2.COLOR_GRAY2RGB
     )
 
-    rgb[mask > 0] = [255, 0, 0]
+    rgb[mask > 0] = [
+        255, 0, 0
+    ]
 
     return rgb
 
@@ -256,15 +282,13 @@ def overlay_mask_on_image(
 if __name__ == "__main__":
 
     TEST_MASK = (
-        "/kaggle/input/"
-        "brain-stroke-ct-dataset/"
-        "Brain_Stroke_CT_Dataset/"
-        "External_Test/"
-        "MASKS/"
-        "15708.png"
+        r"D:\vscode\SWIM\Brain_Stroke_CT_Dataset"
+        r"\Bleeding\OVERLAY\10002.png"
     )
 
-    processor = LesionMaskProcessor()
+    processor = (
+        LesionMaskProcessor()
+    )
 
     result = processor.process(
         TEST_MASK
@@ -274,13 +298,22 @@ if __name__ == "__main__":
 
     stats = result["statistics"]
 
-    print("\nMask Shape:", mask.shape)
+    print(
+        "\nMask Shape:",
+        mask.shape
+    )
 
     print("\nStatistics")
+
     print("-" * 50)
 
     for k, v in stats.items():
-        print(k, ":", v)
+
+        print(
+            k,
+            ":",
+            v
+        )
 
     visualize_mask(
         mask,
